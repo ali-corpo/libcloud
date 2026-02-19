@@ -31,9 +31,6 @@ from libcloud.compute.base import (
 from libcloud.compute.types import Provider, StorageVolumeState, VolumeSnapshotState
 from libcloud.compute.drivers.openstack import OpenStackKeyPair, OpenStackNodeDriver
 
-from libcloud.libcloud.utils import logging
-
-
 class OvhNodeDriver(NodeDriver):
     """
     Libcloud driver for the Ovh API
@@ -163,7 +160,7 @@ class OvhNodeDriver(NodeDriver):
         for key_pair in key_pairs:
             if key_pair.public_key == pubkey:
                 return {"keyName": key_pair.name, "keyId": key_pair.extra["id"]}
-        key_fingerprint = get_pubkey_ssh2_fingerprint(pubkey)
+        key_fingerprint = get_pubkey_ssh2_fingerprint(pubkey).replace(":", "-")
         key_comment = get_pubkey_comment(pubkey, default="unnamed")
         key_name = "{}-{}".format(key_comment, key_fingerprint)
         key_pair=self.import_key_pair_from_string(key_name, pubkey, ex_location=location)
