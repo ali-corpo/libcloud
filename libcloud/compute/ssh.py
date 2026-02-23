@@ -659,21 +659,18 @@ class ParamikoSSHClient(BaseSSHClient):
         # NOTE: Paramiko only supports key in PKCS#1 PEM format.
         """
         # Map paramiko key classes to their PEM header types
+        assert paramiko
         pem_header_map = {
             "RSAKey": "RSA",
-            "Ed25519Key": "OPENSSH",   
+            "Ed25519Key": "Ed25519",   
             "ECDSAKey": "EC",
             "DSSKey": "DSA",
         }
 
         key_types = [(cls, pem_header_map[cls.__name__]) for cls in paramiko.key_classes]
 
-        paramiko_version = getattr(paramiko, "__version__", "0.0.0")
-        paramiko_version = tuple(int(c) for c in paramiko_version.split("."))
 
-        if paramiko_version >= (2, 2, 0):
-            # Ed25519 is only supported in paramiko >= 2.2.0
-            key_types.append((paramiko.ed25519key.Ed25519Key, "Ed25519"))
+
 
         for cls, key_type in key_types:
             # Work around for paramiko not recognizing keys which start with
