@@ -1475,7 +1475,7 @@ class NodeDriver(BaseDriver):
     ##
     # Image management methods
     ##
-
+    
     def list_images(self, location=None):
         # type: (Optional[NodeLocation]) -> List[NodeImage]
         """

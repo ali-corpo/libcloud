@@ -158,7 +158,7 @@ class OvhNodeDriver(NodeDriver):
     def ex_find_or_import_keypair_by_key_material(self, location, pubkey):
         key_pairs = self.list_key_pairs(ex_location=location)
         for key_pair in key_pairs:
-            if key_pair.public_key == pubkey:
+            if key_pair.public_key.strip() == pubkey.strip():
                 return {"keyName": key_pair.name, "keyId": key_pair.extra["id"]}
         key_fingerprint = get_pubkey_ssh2_fingerprint(pubkey).replace(":", "-")
         key_comment = get_pubkey_comment(pubkey, default="unnamed")
@@ -612,7 +612,9 @@ class OvhNodeDriver(NodeDriver):
         return [self._to_size(obj) for obj in objs]
 
     def _to_image(self, obj):
-        extra = {"region": obj["region"], "visibility": obj["visibility"], "status": obj["status"]}
+        extra = {**obj}
+        extra.pop("id")
+        extra.pop("name")
 
         return NodeImage(id=obj["id"], name=obj["name"], driver=self, extra=extra)
 
@@ -671,3 +673,9 @@ class OvhNodeDriver(NodeDriver):
             "status": "creating",
         })        
         
+    def delete_image(self, node_image: NodeImage):
+        action = self._get_project_action("instance/%s/snapshot" % node_image.id) 
+        response = self.connection.request(action, method="DELETE")
+        return  self._to_image(response.object)  
+        
+    
