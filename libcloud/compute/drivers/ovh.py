@@ -98,7 +98,7 @@ class OvhNodeDriver(NodeDriver):
         """
         action = self._get_project_action("instance")
         data = {}
-
+        
         if location:
             data["region"] = location.id
         response = self.connection.request(action, data=data)
@@ -674,7 +674,7 @@ class OvhNodeDriver(NodeDriver):
         })        
         
     def delete_image(self, node_image: NodeImage):
-        action = self._get_project_action("instance/%s/snapshot" % node_image.id) 
+        action = self._get_project_action("snapshot/%s" % node_image.id) 
         response = self.connection.request(action, method="DELETE")
         return  self._to_image(response.object)  
         

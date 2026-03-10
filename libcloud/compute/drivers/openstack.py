@@ -148,6 +148,7 @@ class OpenStackNodeDriver(NodeDriver, OpenStackDriverMixin):
         "SHARE_IP_NO_CONFIG": NodeState.PENDING,
         "DELETE_IP": NodeState.PENDING,
         "ERROR": NodeState.ERROR,
+        "SNAPSHOTTING": NodeState.SNAPSHOTTING,
         "UNKNOWN": NodeState.UNKNOWN,
     }
 

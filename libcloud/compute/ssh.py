@@ -244,14 +244,16 @@ class BaseSSHClient:
         """
         raise NotImplementedError("close not implemented for this ssh client")
 
-    def _get_and_setup_logger(self):
-        # type: () -> logging.Logger
+    def _get_and_setup_logger(self, logger_path:str=""):
+        # type: (str) -> logging.Logger
         logger = logging.getLogger("libcloud.compute.ssh")
-        path = os.getenv("LIBCLOUD_DEBUG")
+        path = logger_path or os.getenv("LIBCLOUD_DEBUG")
 
         if path:
+            os.makedirs(os.path.dirname(path), exist_ok=True)
             handler = logging.FileHandler(path)
             handler.setFormatter(ExtraLogFormatter())
+            logger.handlers.clear()
             logger.addHandler(handler)
             logger.setLevel(logging.DEBUG)
 
@@ -282,6 +284,8 @@ class ParamikoSSHClient(BaseSSHClient):
         timeout=None,  # type: Optional[float]
         keep_alive=None,  # type: Optional[int]
         use_compression=False,  # type: bool
+        logger_path="",  # type: str
+
     ):
         """
         Authentication is always attempted in the following order:
@@ -321,7 +325,7 @@ class ParamikoSSHClient(BaseSSHClient):
         # Long term we should switch to a more secure default, but this would break
         # a lot  of non-interactive deployment scripts
         self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # nosec
-        self.logger = self._get_and_setup_logger()
+        self.logger = self._get_and_setup_logger(logger_path)
 
         # This object is lazily created on first SFTP operation (e.g. put()
         # method call)
@@ -649,7 +653,10 @@ class ParamikoSSHClient(BaseSSHClient):
         # We only decode data at the end because a single chunk could contain
         # a part of multi byte UTF-8 character (whole multi bytes character
         # could be split over two chunks)
-        result.write(result_bytes.decode("utf-8", errors="ignore"))
+        decoded=result_bytes.decode("utf-8", errors="ignore")
+        result.write(decoded)
+        if len(decoded.strip())>0:
+            self.logger.debug(decoded.strip())
         return result
 
     def _get_pkey_object(self, key, password=None):

@@ -228,6 +228,7 @@ class NodeState(Type):
     STARTING = "starting"
     REBOOTING = "rebooting"
     TERMINATED = "terminated"
+    TERMINATING = "terminating"
     PENDING = "pending"
     UNKNOWN = "unknown"
     STOPPING = "stopping"
@@ -239,6 +240,8 @@ class NodeState(Type):
     MIGRATING = "migrating"
     NORMAL = "normal"
     UPDATING = "updating"
+    SNAPSHOTTING = "snapshotting"
+
 
 
 class StorageVolumeState(Type):
